@@ -277,9 +277,8 @@ insertDeleteProposal
     -> Property
 insertDeleteProposal ps =
     let getUpId p = hash $ Poll.psProposal p
-        upId = getUpId ps
         actionPrefixGen = arbitrary `suchThat` (\case
-            InsertActiveProposal ps' -> upId /= getUpId ps'
+            InsertActiveProposal ps' -> getUpId ps /= getUpId ps'
             _                        -> True)
     in ([InsertActiveProposal ps, DeactivateProposal upId] ==^ [])
        actionPrefixGen

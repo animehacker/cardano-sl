@@ -144,12 +144,25 @@ verifyHeader VerifyHeaderParams {..} h =
         case h of
             Left _ -> []
             Right mainHeader ->
+                [ let expected    = (addressHash $ mainHeader ^. mainHeaderLeaderKey)
+                      Just actual = leaders ^?
+                                      ix (fromIntegral $ getSlotIndex $
+                                          siSlot $ mainHeader ^. headerSlotL)
+                  in ( expected == actual
+                     , sformat ( "block's leader is different from expected one; "
+                               % "expected: " % build
+                               % ", actual: " % build
+                               ) expected actual
+                     )
+                ]
+{-
                 [ ( (Just (addressHash $ mainHeader ^. mainHeaderLeaderKey) ==
                      leaders ^?
                      ix (fromIntegral $ getSlotIndex $
                          siSlot $ mainHeader ^. headerSlotL))
                   , "block's leader is different from expected one")
                 ]
+-}
 
     verifyNoUnknown (Left genH) =
         let attrs = genH ^. gbhExtra . gehAttributes
